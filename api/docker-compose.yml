@@ -6,11 +6,15 @@ services:
     container_name: appliances
     ports:
       - 8081:3000
-    expose:
-      - 8081
     volumes:
       - ./appliances/src:/home/app/src
     command: npm run start
+    environment:
+      - APP_PORT=3000
+    env_file:
+      - .env
+    depends_on:
+      - auth
 
   nginx:
     build: ./nginx
@@ -19,3 +23,20 @@ services:
       - 8080:8080
     links:
       - appliances
+      - auth
+    depends_on:
+      - auth
+      - appliances
+
+  auth:
+    build: ./auth
+    container_name: auth
+    ports:
+      - 8082:3001
+    volumes:
+      - ./auth/src:/home/app/src
+    command: npm run start
+    environment:
+      - APP_PORT=3001
+    env_file:
+      - .env
